@@ -39,8 +39,11 @@
 @property(nonatomic, assign) NSObject<QuickDialogStyleProvider> *styleProvider;
 @property(nonatomic) BOOL deselectRowWhenViewAppears;
 
+- (QuickDialogTableView *)initWithRoot:(QRootElement *)root;
 
 - (QuickDialogTableView *)initWithController:(QuickDialogController *)controller;
+
+- (NSIndexPath *)indexForElement:(QElement *)element;
 
 - (UITableViewCell *)cellForElement:(QElement *)element;
 

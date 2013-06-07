@@ -27,6 +27,23 @@
     return _controller;
 }
 
+- (QuickDialogTableView *)initWithRoot:(QRootElement *)root {
+  self = [super initWithFrame:CGRectZero
+                        style:root.grouped];
+  if (self != nil) {
+    self.root = root;
+    self .deselectRowWhenViewAppears = YES;
+    quickformDataSource = [[QuickDialogDataSource alloc] initForTableView:self];
+    self.dataSource = quickformDataSource;
+    
+    quickformDelegate = [[QuickDialogTableDelegate alloc] initForTableView:self];
+    self.delegate = quickformDelegate;
+    self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+  }
+  return self;
+  
+}
+
 - (QuickDialogTableView *)initWithController:(QuickDialogController *)controller {
     self = [super initWithFrame:CGRectMake(0, 0, 0, 0) style:controller.root.grouped ? UITableViewStyleGrouped : UITableViewStylePlain];
     if (self!=nil){
@@ -86,10 +103,32 @@
     return NULL;
 }
 
+- (NSIndexPath *)visibleIndexForElement:(QElement *)element {
+    if (element.hidden)
+        return NULL;
+    
+    NSUInteger s = 0;
+    for (QSection * q in _root.sections)
+    {
+        if (!q.hidden)
+        {
+            NSUInteger e = 0;
+            for (QElement * r in q.elements)
+            {
+                if (r == element)
+                    return [NSIndexPath indexPathForRow:e inSection:s];
+                ++e;
+            }
+        }
+        ++s;
+    }
+    return NULL;
+}
+
 - (UITableViewCell *)cellForElement:(QElement *)element {
     if (element.hidden)
         return nil;
-    return [self cellForRowAtIndexPath:[element getIndexPath]];
+    return [self cellForRowAtIndexPath:[self visibleIndexForElement:element]];
 }
 
 - (void)viewWillAppear {
